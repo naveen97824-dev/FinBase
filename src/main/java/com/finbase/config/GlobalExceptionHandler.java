@@ -1,4 +1,4 @@
-package com.finbase.exception;
+package com.finbase.config;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.finbase.controller;
+package com.finbase.api;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

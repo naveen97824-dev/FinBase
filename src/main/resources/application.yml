@@ -14,6 +14,22 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        # Second-level cache stays OFF, always. It caches entity state across
+        # requests independent of the RLS session variable, so a row cached
+        # while serving one financier can be served back to another on a
+        # cache hit — a silent cross-tenant leak. See CLAUDE.md / tech-stack §2.2.
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 server:
   port: 8080

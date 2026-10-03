@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- EI_EXPOSE_REP/REP2: constructor-injected Spring beans are shared,
+         framework-managed singletons, not caller-owned mutable state — this
+         is how dependency injection works, not a representation leak. -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Or>
+            <Field name="jdbcTemplate"/>
+            <Field name="txManager"/>
+        </Or>
+    </Match>
+</FindBugsFilter>
