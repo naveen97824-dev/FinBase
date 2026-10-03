@@ -1,6 +1,7 @@
 package com.finbase.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.DriverManager;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -103,15 +105,25 @@ class TenantIsolationTest {
     }
 
     private UUID insertCustomer(UUID financierId, String code, String mobile) {
+        return insertCustomer(financierId, code, mobile, financierId);
+    }
+
+    /**
+     * Inserts a customer row whose {@code financier_id} column is
+     * {@code rowFinancierId}, under a tenant session scoped to
+     * {@code sessionFinancierId}. When the two differ, this simulates a
+     * spoofed insert and the RLS policy's WITH CHECK clause must reject it.
+     */
+    private UUID insertCustomer(UUID rowFinancierId, String code, String mobile, UUID sessionFinancierId) {
         UUID id = UUID.randomUUID();
-        tenantSession.execute(financierId, tx -> jdbcTemplate.update("""
+        tenantSession.execute(sessionFinancierId, tx -> jdbcTemplate.update("""
                 INSERT INTO customers (id, financier_id, customer_code, full_name, mobile,
                     address_line1, area, city_village, district, state, pincode,
                     pan_encrypted, pan_last4, pan_hash)
                 VALUES (?, ?, ?, 'Test Customer', ?,
                     'Addr 1', 'Area', 'City', 'District', 'TamilNadu', '600001',
                     '\\x00', '0000', ?)
-                """, id, financierId, code, mobile, UUID.randomUUID().toString()));
+                """, id, rowFinancierId, code, mobile, UUID.randomUUID().toString()));
         return id;
     }
 
@@ -131,14 +143,38 @@ class TenantIsolationTest {
         UUID customerA = insertCustomer(companyA, "CUS-A-001", "9000000003");
         insertLoan(companyA, customerA, "LN-TEST-A-001");
 
-        List<Map<String, Object>> rowsSeenByB = tenantSession.execute(companyB,
+        List<Map<String, Object>> loansSeenByB = tenantSession.execute(companyB,
                 tx -> jdbcTemplate.queryForList("SELECT * FROM loans"));
+        assertThat(loansSeenByB).isEmpty();
 
-        assertThat(rowsSeenByB).isEmpty();
+        List<Map<String, Object>> customersSeenByB = tenantSession.execute(companyB,
+                tx -> jdbcTemplate.queryForList("SELECT * FROM customers"));
+        assertThat(customersSeenByB).isEmpty();
 
-        List<Map<String, Object>> rowsSeenByA = tenantSession.execute(companyA,
+        List<Map<String, Object>> loansSeenByA = tenantSession.execute(companyA,
                 tx -> jdbcTemplate.queryForList("SELECT * FROM loans"));
+        assertThat(loansSeenByA).hasSize(1);
 
-        assertThat(rowsSeenByA).hasSize(1);
+        List<Map<String, Object>> customersSeenByA = tenantSession.execute(companyA,
+                tx -> jdbcTemplate.queryForList("SELECT * FROM customers"));
+        assertThat(customersSeenByA).hasSize(1);
+    }
+
+    @Test
+    void companyBCannotInsertARowStampedWithCompanyAsFinancierId() {
+        UUID companyA = insertFinancier("FIN-TEST-C", "9000000004");
+        UUID companyB = insertFinancier("FIN-TEST-D", "9000000005");
+
+        // Company B's tenant session has set_config('app.current_financier_id', ...)
+        // to companyB, but the row being inserted claims financier_id = companyA.
+        // The RLS policy's WITH CHECK clause must reject this even though the
+        // INSERT is syntactically well-formed and would succeed with no RLS.
+        assertThatThrownBy(() -> insertCustomer(companyA, "CUS-SPOOF-001", "9000000006", companyB))
+                .isInstanceOf(DataAccessException.class);
+
+        // Confirm nothing was actually written under either financier.
+        List<Map<String, Object>> customersSeenByA = tenantSession.execute(companyA,
+                tx -> jdbcTemplate.queryForList("SELECT * FROM customers"));
+        assertThat(customersSeenByA).isEmpty();
     }
 }

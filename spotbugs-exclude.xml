@@ -8,6 +8,7 @@
         <Or>
             <Field name="jdbcTemplate"/>
             <Field name="txManager"/>
+            <Field name="currentFinancierHolder"/>
         </Or>
     </Match>
 

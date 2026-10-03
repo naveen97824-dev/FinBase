@@ -31,6 +31,12 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
 
+finbase:
+  jwt:
+    # Must be overridden in every real environment via FINBASE_JWT_SECRET —
+    # this placeholder exists only so local/dev boots without extra setup.
+    secret: ${FINBASE_JWT_SECRET:dev-only-secret-change-me-dev-only-secret-change-me}
+
 server:
   port: 8080
 
