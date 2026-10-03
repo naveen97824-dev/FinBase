@@ -2,6 +2,7 @@ package com.finbase.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,6 +13,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
 
 /**
  * Audit of every vehicle registry lookup. Powers rate limiting, enumeration
@@ -19,9 +22,10 @@ import org.hibernate.type.SqlTypes;
  */
 @Entity
 @Table(name = "vehicle_inspection_queries")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class VehicleInspectionQuery {
+public class VehicleInspectionQuery implements CreatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

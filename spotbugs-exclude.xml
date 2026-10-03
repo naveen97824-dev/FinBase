@@ -9,6 +9,9 @@
             <Field name="jdbcTemplate"/>
             <Field name="txManager"/>
             <Field name="currentFinancierHolder"/>
+            <Field name="otpStore"/>
+            <Field name="objectMapper"/>
+            <Field name="redis"/>
         </Or>
     </Match>
 

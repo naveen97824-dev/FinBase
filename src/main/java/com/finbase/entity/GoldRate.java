@@ -2,6 +2,7 @@ package com.finbase.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
@@ -9,13 +10,16 @@ import java.time.Instant;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
 
 /** Shared daily reference rate for gold valuation. */
 @Entity
 @Table(name = "gold_rates")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class GoldRate {
+public class GoldRate implements CreatedAtAware {
 
     @Id
     @Column(name = "rate_date", nullable = false)

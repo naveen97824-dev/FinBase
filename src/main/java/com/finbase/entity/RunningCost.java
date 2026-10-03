@@ -4,6 +4,7 @@ import com.finbase.entity.enums.Frequency;
 import com.finbase.entity.enums.PaymentMode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -16,13 +17,19 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
+import com.finbase.entity.listener.UpdatedAtAware;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /** A recurring cost template — generates {@link RunningCostPayment} rows each period. */
 @Entity
 @Table(name = "running_costs")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class RunningCost {
+public class RunningCost implements CreatedAtAware, UpdatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -43,6 +50,7 @@ public class RunningCost {
     @Column(name = "amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "frequency", nullable = false)
     private Frequency frequency;
@@ -62,6 +70,7 @@ public class RunningCost {
     @Column(name = "payee_contact", length = 15)
     private String payeeContact;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_mode", nullable = false)
     private PaymentMode paymentMode;

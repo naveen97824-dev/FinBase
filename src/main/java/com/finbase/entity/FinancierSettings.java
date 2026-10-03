@@ -28,10 +28,12 @@ public class FinancierSettings {
     @Column(name = "financier_id")
     private UUID financierId;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "default_interest_scheme", nullable = false)
     private InterestScheme defaultInterestScheme = InterestScheme.A_monthly_interest_bullet;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "default_rate_type", nullable = false)
     private RateType defaultRateType = RateType.per_month;
@@ -39,6 +41,7 @@ public class FinancierSettings {
     @Column(name = "default_grace_days", nullable = false)
     private short defaultGraceDays = 5;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "default_penal_type", nullable = false)
     private PenalType defaultPenalType = PenalType.percentage;

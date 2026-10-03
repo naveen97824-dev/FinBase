@@ -2,6 +2,7 @@ package com.finbase.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,13 +11,17 @@ import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
+import com.finbase.entity.listener.UpdatedAtAware;
 
 /** Brokers live in their own table, not free text — volume per broker matters. */
 @Entity
 @Table(name = "brokers")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class Broker {
+public class Broker implements CreatedAtAware, UpdatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

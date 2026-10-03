@@ -12,6 +12,8 @@ import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /** {@code financierId == null} means a system default category, shared across all tenants. */
 @Entity
@@ -30,6 +32,7 @@ public class ExpenseCategory {
     @Column(name = "name", nullable = false, length = 80)
     private String name;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "kind", nullable = false)
     private ExpenseKind kind;

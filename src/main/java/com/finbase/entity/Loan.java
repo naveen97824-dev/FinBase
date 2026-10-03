@@ -9,6 +9,7 @@ import com.finbase.entity.enums.PenalType;
 import com.finbase.entity.enums.RateType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +22,11 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
+import com.finbase.entity.listener.UpdatedAtAware;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * No approval fields — a created loan starts ACTIVE immediately.
@@ -28,9 +34,10 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "loans")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class Loan {
+public class Loan implements CreatedAtAware, UpdatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -51,10 +58,12 @@ public class Loan {
     @Column(name = "broker_id")
     private UUID brokerId;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "loan_type", nullable = false)
     private LoanType loanType;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private LoanStatus status = LoanStatus.active;
@@ -65,10 +74,12 @@ public class Loan {
     @Column(name = "interest_rate", nullable = false, precision = 6, scale = 3)
     private BigDecimal interestRate;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "rate_type", nullable = false)
     private RateType rateType = RateType.per_month;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "interest_scheme", nullable = false)
     private InterestScheme interestScheme = InterestScheme.A_monthly_interest_bullet;
@@ -79,6 +90,7 @@ public class Loan {
     @Column(name = "tenure_unit", nullable = false, length = 10)
     private String tenureUnit = "months";
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "repayment_frequency", nullable = false)
     private Frequency repaymentFrequency = Frequency.monthly;
@@ -98,6 +110,7 @@ public class Loan {
     @Column(name = "grace_days", nullable = false)
     private short graceDays = 5;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "penal_type", nullable = false)
     private PenalType penalType = PenalType.percentage;
@@ -120,6 +133,7 @@ public class Loan {
     @Column(name = "disbursal_date", nullable = false)
     private LocalDate disbursalDate = LocalDate.now();
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "disbursal_mode")
     private PaymentMode disbursalMode;

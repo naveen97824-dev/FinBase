@@ -4,6 +4,7 @@ import com.finbase.entity.enums.PaymentMode;
 import com.finbase.entity.enums.TxnType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +17,10 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * The immutable ledger. Corrections are reversal entries, never edits or
@@ -24,9 +29,10 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "loan_transactions")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class LoanTransaction {
+public class LoanTransaction implements CreatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -41,6 +47,7 @@ public class LoanTransaction {
     @Column(name = "schedule_id")
     private UUID scheduleId;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "txn_type", nullable = false)
     private TxnType txnType;
@@ -69,6 +76,7 @@ public class LoanTransaction {
     @Column(name = "balance_after", precision = 15, scale = 2)
     private BigDecimal balanceAfter;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_mode")
     private PaymentMode paymentMode;

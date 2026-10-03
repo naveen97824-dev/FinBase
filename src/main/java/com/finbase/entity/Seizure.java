@@ -4,6 +4,7 @@ import com.finbase.entity.enums.LoanType;
 import com.finbase.entity.enums.SeizureReason;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -16,6 +17,11 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
+import com.finbase.entity.listener.UpdatedAtAware;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * Simplified in v2: no status enum, no owner-approval chain. Current state
@@ -25,9 +31,10 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "seizures")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class Seizure {
+public class Seizure implements CreatedAtAware, UpdatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -45,6 +52,7 @@ public class Seizure {
     @Column(name = "customer_id", nullable = false)
     private UUID customerId;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "collateral_type", nullable = false)
     private LoanType collateralType;
@@ -55,6 +63,7 @@ public class Seizure {
     @Column(name = "seizure_date", nullable = false)
     private LocalDate seizureDate;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "reason", nullable = false)
     private SeizureReason reason;

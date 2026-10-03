@@ -2,6 +2,7 @@ package com.finbase.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
@@ -13,6 +14,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
 
 /**
  * Precomputed dashboard aggregates. The dashboard reads this table, never
@@ -21,10 +24,11 @@ import org.hibernate.type.SqlTypes;
  */
 @Entity
 @Table(name = "daily_snapshots")
+@EntityListeners(TimestampListener.class)
 @IdClass(DailySnapshotId.class)
 @Getter
 @Setter
-public class DailySnapshot {
+public class DailySnapshot implements CreatedAtAware {
 
     @Id
     @Column(name = "financier_id")

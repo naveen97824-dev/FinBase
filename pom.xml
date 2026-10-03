@@ -42,6 +42,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+		<!-- Argon2PasswordEncoder needs Bouncy Castle at runtime; Spring
+		     Security does not pull it in transitively. -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk18on</artifactId>
+			<version>1.80</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
@@ -73,13 +80,6 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>${jjwt.version}</version>
 			<scope>runtime</scope>
-		</dependency>
-
-		<!-- Rate limiting: OTP and registry-query throttling -->
-		<dependency>
-			<groupId>com.bucket4j</groupId>
-			<artifactId>bucket4j_jdk11-core</artifactId>
-			<version>8.14.0</version>
 		</dependency>
 
 		<!-- ShedLock: single-runner guarantee for @Scheduled jobs -->
@@ -130,6 +130,12 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.redis</groupId>
+			<artifactId>testcontainers-redis</artifactId>
+			<version>2.2.4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

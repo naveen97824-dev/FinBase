@@ -4,6 +4,7 @@ import com.finbase.entity.enums.PaymentMode;
 import com.finbase.entity.enums.PaymentStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -16,13 +17,18 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /** One generated payable per period for a {@link RunningCost} template. */
 @Entity
 @Table(name = "running_cost_payments")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class RunningCostPayment {
+public class RunningCostPayment implements CreatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -46,6 +52,7 @@ public class RunningCostPayment {
     @Column(name = "amount_paid", nullable = false, precision = 15, scale = 2)
     private BigDecimal amountPaid = BigDecimal.ZERO;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private PaymentStatus status = PaymentStatus.pending;
@@ -53,6 +60,7 @@ public class RunningCostPayment {
     @Column(name = "paid_date")
     private LocalDate paidDate;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_mode")
     private PaymentMode paymentMode;

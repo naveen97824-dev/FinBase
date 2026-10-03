@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * Vehicle-loan additional fields. The chassis number is the highest-value
@@ -49,6 +51,7 @@ public class LoanVehicleDetails {
     @Column(name = "engine_number_norm", length = 25)
     private String engineNumberNorm;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "vehicle_type", nullable = false)
     private VehicleType vehicleType;

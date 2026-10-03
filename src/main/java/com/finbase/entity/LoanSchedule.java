@@ -3,6 +3,7 @@ package com.finbase.entity;
 import com.finbase.entity.enums.ScheduleStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -15,13 +16,19 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
+import com.finbase.entity.listener.UpdatedAtAware;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /** One row per installment. Drives Current Dues and Pending Dues. */
 @Entity
 @Table(name = "loan_schedule")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class LoanSchedule {
+public class LoanSchedule implements CreatedAtAware, UpdatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -75,6 +82,7 @@ public class LoanSchedule {
     @Column(name = "waived_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal waivedAmount = BigDecimal.ZERO;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private ScheduleStatus status = ScheduleStatus.pending;

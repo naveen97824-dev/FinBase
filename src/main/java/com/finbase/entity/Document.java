@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /** Unified document vault — the Aadhaar photocopy lives here, never an Aadhaar number. */
 @Entity
@@ -41,6 +43,7 @@ public class Document {
     @Column(name = "expense_id")
     private UUID expenseId;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false)
     private DocCategory category;

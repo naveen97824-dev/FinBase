@@ -4,6 +4,7 @@ import com.finbase.entity.enums.EntityType;
 import com.finbase.entity.enums.FinancierStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -17,6 +18,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
+import com.finbase.entity.listener.UpdatedAtAware;
 
 /**
  * One row per company — also the login account, since there is exactly one
@@ -26,9 +30,10 @@ import org.hibernate.type.SqlTypes;
  */
 @Entity
 @Table(name = "financiers")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class Financier {
+public class Financier implements CreatedAtAware, UpdatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -40,6 +45,7 @@ public class Financier {
     @Column(name = "company_name", nullable = false, length = 150)
     private String companyName;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "entity_type", nullable = false)
     private EntityType entityType;
@@ -120,6 +126,7 @@ public class Financier {
     @Column(name = "last_login_at")
     private Instant lastLoginAt;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private FinancierStatus status = FinancierStatus.pending_verification;

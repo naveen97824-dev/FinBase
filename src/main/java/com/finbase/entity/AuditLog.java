@@ -2,6 +2,7 @@ package com.finbase.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,6 +14,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
 
 /**
  * Append-only. No user_id: one shared login per company, so this records
@@ -21,10 +24,11 @@ import org.hibernate.type.SqlTypes;
  */
 @Entity
 @Table(name = "audit_log")
+@EntityListeners(TimestampListener.class)
 @IdClass(AuditLogId.class)
 @Getter
 @Setter
-public class AuditLog {
+public class AuditLog implements CreatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

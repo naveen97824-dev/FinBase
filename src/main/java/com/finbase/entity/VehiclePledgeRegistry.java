@@ -4,6 +4,7 @@ import com.finbase.entity.enums.PledgeStatus;
 import com.finbase.entity.enums.VehicleType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -15,6 +16,11 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
+import com.finbase.entity.listener.UpdatedAtAware;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * The shared cross-company table. No borrower PII, no loan financials —
@@ -22,9 +28,10 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "vehicle_pledge_registry")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class VehiclePledgeRegistry {
+public class VehiclePledgeRegistry implements CreatedAtAware, UpdatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -42,6 +49,7 @@ public class VehiclePledgeRegistry {
     @Column(name = "engine_number_norm", length = 25)
     private String engineNumberNorm;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "vehicle_type")
     private VehicleType vehicleType;
@@ -61,6 +69,7 @@ public class VehiclePledgeRegistry {
     @Column(name = "loan_id", nullable = false)
     private UUID loanId;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private PledgeStatus status = PledgeStatus.active;

@@ -3,6 +3,7 @@ package com.finbase.entity;
 import com.finbase.entity.enums.PaymentMode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -15,13 +16,18 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import com.finbase.entity.listener.CreatedAtAware;
+import com.finbase.entity.listener.TimestampListener;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /** Ad-hoc, usually-cash expense entry. Reversals are contra entries, never deletes. */
 @Entity
 @Table(name = "petty_expenses")
+@EntityListeners(TimestampListener.class)
 @Getter
 @Setter
-public class PettyExpense {
+public class PettyExpense implements CreatedAtAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -45,6 +51,7 @@ public class PettyExpense {
     @Column(name = "amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_mode", nullable = false)
     private PaymentMode paymentMode;
