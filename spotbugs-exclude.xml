@@ -10,4 +10,16 @@
             <Field name="txManager"/>
         </Or>
     </Match>
+
+    <!-- BYTEA columns are necessarily byte[] on the JPA entity; Hibernate
+         owns the array's lifecycle between load and flush, so the usual
+         "copy defensively" fix doesn't apply the way it would to a plain
+         POJO. -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Or>
+            <Field name="panEncrypted"/>
+            <Field name="accountNumberEncrypted"/>
+        </Or>
+    </Match>
 </FindBugsFilter>
