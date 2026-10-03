@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: FinBase
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/finbase
+    username: ${DB_USERNAME:finbase}
+    password: ${DB_PASSWORD:finbase}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized

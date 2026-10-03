@@ -1,0 +1,11 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:postgresql://localhost:5432/finbase
+
+logging:
+  level:
+    com.finbase: DEBUG
+    org.hibernate.SQL: DEBUG
